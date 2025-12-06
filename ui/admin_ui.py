@@ -1,18 +1,18 @@
 import streamlit as st
 import requests
 
-API = "http://127.0.0.1:8000"
+# ❗ REMOVE HARDCODED API = "127.0.0.1"
 
-# Import UI components
+
 from ui.add_book_ui import show_add_book
 from ui.edit_book_ui import show_edit_book
 from ui.delete_book_ui import show_delete_book
 
 
 # -------------------------------------------------------
-# Fetching Stats
+# Fetching Stats — FIXED to use API passed from main
 # -------------------------------------------------------
-def _fetch_stats():
+def _fetch_stats(API):
     try:
         books = requests.get(f"{API}/books").json()
     except:
@@ -36,14 +36,15 @@ def _fetch_stats():
 # ADMIN DASHBOARD
 # -------------------------------------------------------
 def show_admin_dashboard(API):
+
     if not st.session_state.get("is_admin", False):
         st.error("❌ Access denied. Admins only.")
         return
 
     st.title("🛠️ Admin Dashboard")
 
-    # Fetch stats
-    books, users, total_books, total_users, total_stock, out_of_stock = _fetch_stats()
+    # Fetch stats — FIXED
+    books, users, total_books, total_users, total_stock, out_of_stock = _fetch_stats(API)
 
     # ---------------- TOP STATISTICS ----------------
     c1, c2, c3, c4 = st.columns(4)
@@ -54,7 +55,6 @@ def show_admin_dashboard(API):
 
     st.markdown("---")
 
-    # ---------------- SIDEBAR SECTIONS ----------------
     section = st.sidebar.radio(
         "📌 Select Section",
         ["Books", "Users", "Analytics"],
@@ -82,8 +82,6 @@ def show_admin_dashboard(API):
         elif action == "Delete Book":
             show_delete_book(API)
 
-
-
     # ============================================================
     # 🔵 USERS SECTION — SHOW ALL USERS
     # ============================================================
@@ -106,16 +104,12 @@ def show_admin_dashboard(API):
                     unsafe_allow_html=True
                 )
 
-
-
     # ============================================================
-    # 🔵 ANALYTICS SECTION (Simple Placeholder)
+    # 🔵 ANALYTICS SECTION
     # ============================================================
     if section == "Analytics":
         st.subheader("📊 Analytics Dashboard")
         st.info("Future feature: charts, trends, reports, usage analytics.")
-
-
 
     # ---------------- LOGOUT BUTTON ----------------
     st.sidebar.markdown("---")
