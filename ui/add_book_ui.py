@@ -6,8 +6,8 @@ def show_add_book(API):
 
     title = st.text_input("Book Title")
     author = st.text_input("Author")
-    price = st.number_input("Price", min_value=0.0)
-    quantity = st.number_input("Quantity", min_value=0)
+    price = st.number_input("Price", min_value=0.0, step=0.1)
+    quantity = st.number_input("Quantity", min_value=0, step=1)
 
     if st.button("Add Book"):
         data = {
@@ -15,14 +15,16 @@ def show_add_book(API):
             "admin_password": "Honey@123",
             "title": title,
             "author": author,
-            "price": price,
-            "quantity": quantity
+            "price": float(price),
+            "quantity": int(quantity)
         }
 
-        # FIXED: json instead of data
         response = requests.post(f"{API}/books", json=data)
 
-        if response.status_code == 200:
+        if response.status_code in (200, 201):
             st.success("Book added successfully!")
         else:
-            st.error(response.json().get("detail", "Unknown error"))
+            try:
+                st.error(response.json().get("detail"))
+            except:
+                st.error("Unknown error")
