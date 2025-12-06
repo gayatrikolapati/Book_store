@@ -1,9 +1,8 @@
 import streamlit as st
 import requests
 
-API = "http://127.0.0.1:8000"
 
-def show_login():
+def show_login(API):   # ✔ Accept API from main
 
     st.title("🔐 Login Portal")
 
@@ -34,10 +33,10 @@ def show_login():
 
             # Try to login through backend
             try:
-                r = requests.post(
-                    f"{API}/login",
-                    params={"email": email, "password": password}
-                )
+                payload = {"email": email, "password": password}
+
+                # ✔ FIXED: use json instead of params
+                r = requests.post(f"{API}/login", json=payload)
 
                 if r.status_code != 200:
                     st.error(r.json().get("detail", "Invalid login"))
@@ -69,8 +68,8 @@ def show_login():
 
         if st.button("Login as Admin"):
 
-            # ✔ Use SAME admin credentials from FastAPI
-            if username == "Gayatri" and password == "H":
+            # ✔ FIXED admin credentials — use real ones
+            if username == "Gayatri" and password == "Honey@123":
                 st.session_state.logged_in = True
                 st.session_state.is_admin = True
                 st.session_state.user_name = "Admin"
