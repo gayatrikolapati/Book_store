@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from backend.models import User, Book
 from backend.models_db import UserDB, BookDB
 from database import SessionLocal, engine, Base
+from fastapi.middleware.cors import CORSMiddleware
 import random
 import shutil
 import hashlib
@@ -20,6 +21,14 @@ if not MAILJET_API_KEY or not MAILJET_SECRET_KEY or not MAILJET_SENDER:
     raise Exception("Mailjet environment variables are missing!")
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],        # or put your Streamlit URL here
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/")
 def home():
     return {"message": "Book Store API is running!"}
@@ -230,5 +239,6 @@ def delete_book(book_id: int):
 def get_users():
     db = SessionLocal()
     return db.query(UserDB).all()
+
 
 
