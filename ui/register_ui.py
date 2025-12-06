@@ -1,9 +1,9 @@
 import streamlit as st
 import requests
 
-API = "http://127.0.0.1:8000"
 
-def show_register():
+def show_register(API):
+
     st.title("📝 Register (with OTP verification)")
 
     if "otp_sent" not in st.session_state:
@@ -16,13 +16,13 @@ def show_register():
         with st.form("register_form"):
             name = st.text_input("Name")
             email = st.text_input("Email")
-            age = st.number_input("Age", min_value=0, max_value=120)
+            age = st.number_input("Age", min_value=1, max_value=120)
             password = st.text_input("Password", type="password")
 
             submit = st.form_submit_button("Request OTP")
 
         if submit:
-            if not name or not email or not password or age == 0:
+            if not name or not email or not password:
                 st.error("All fields are required")
                 return
 
@@ -33,26 +33,21 @@ def show_register():
                 "password": password,
             }
 
-            # validate with backend
+            # Validate user details with backend
             try:
                 v = requests.post(f"{API}/validate-user", json=user_data)
             except Exception:
-                st.error("Backend not reachable. Start FastAPI server.")
+                st.error("Backend not reachable.")
                 return
 
             if v.status_code != 200:
-                try:
-                    detail = v.json().get("detail")
-                    if isinstance(detail, list) and detail:
-                        msg = detail[0].get("msg", "Validation error")
-                    else:
-                        msg = str(detail)
-                except Exception:
-                    msg = "Validation failed"
-                st.error(msg)
+                detail = v.json().get("detail", "Validation error")
+                if isinstance(detail, list):
+                    detail = detail[0].get("msg", "Validation error")
+                st.error(detail)
                 return
 
-            # request OTP
+            # Request OTP
             try:
                 r = requests.post(f"{API}/request-otp", params={"email": email})
             except Exception:
@@ -60,16 +55,12 @@ def show_register():
                 return
 
             if r.status_code == 200:
-                st.success("OTP sent to your email.")
+                st.success("OTP sent successfully!")
                 st.session_state.otp_sent = True
                 st.session_state.reg_data = user_data
                 st.rerun()
             else:
-                try:
-                    msg = r.json().get("detail", "Failed to send OTP")
-                except Exception:
-                    msg = "Failed to send OTP"
-                st.error(msg)
+                st.error(r.json().get("detail", "Failed to send OTP"))
 
     # ---------- STEP 2: OTP VERIFY ----------
     else:
@@ -79,10 +70,8 @@ def show_register():
         otp = st.text_input("Enter OTP")
 
         col1, col2 = st.columns(2)
-        with col1:
-            verify_btn = st.button("Verify OTP")
-        with col2:
-            change_btn = st.button("Change Details")
+        verify_btn = col1.button("Verify OTP")
+        change_btn = col2.button("Change Details")
 
         if change_btn:
             st.session_state.otp_sent = False
@@ -94,7 +83,7 @@ def show_register():
                 r = requests.post(
                     f"{API}/verify-otp",
                     json=reg_data,
-                    params={"otp": otp},
+                    params={"otp": otp}
                 )
             except Exception:
                 st.error("Backend error while verifying OTP.")
@@ -106,8 +95,4 @@ def show_register():
                 st.session_state.reg_data = {}
                 st.rerun()
             else:
-                try:
-                    msg = r.json().get("detail", "Invalid OTP")
-                except Exception:
-                    msg = "Server error while verifying OTP"
-                st.error(msg)
+                st.error(r.json().get("detail", "Invalid OTP"))
