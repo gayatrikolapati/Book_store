@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
-from models import User, Book
-from models_db import UserDB, BookDB
+from backend.models import User, Book
+from backend.models_db import UserDB, BookDB
 from database import SessionLocal, engine, Base
 import random
 import shutil
@@ -230,4 +230,5 @@ def delete_book(book_id: int):
 def get_users():
     db = SessionLocal()
     return db.query(UserDB).all()
+
 
