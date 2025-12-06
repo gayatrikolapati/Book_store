@@ -6,7 +6,7 @@ from ui.books_ui import show_books
 from ui.admin_ui import show_admin_dashboard
 
 # ---------------- GLOBAL API URL (VERY IMPORTANT) ----------------
-API = "http://127.0.0.1:8000"
+API = "https://book-store-stvm.onrender.com"
 
 st.set_page_config(
     page_title="Bookstore System",
@@ -72,3 +72,4 @@ elif choice == "Books":
 
 elif choice == "Admin Dashboard":
     show_admin_dashboard(API)   # FIXED: API passed correctly
+
