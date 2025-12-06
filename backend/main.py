@@ -20,6 +20,10 @@ if not MAILJET_API_KEY or not MAILJET_SECRET_KEY or not MAILJET_SENDER:
     raise Exception("Mailjet environment variables are missing!")
 
 app = FastAPI()
+@app.get("/")
+def home():
+    return {"message": "Book Store API is running!"}
+
 
 # -------------------- PASSWORD HASH --------------------
 def hash_password(password: str) -> str:
@@ -226,3 +230,4 @@ def delete_book(book_id: int):
 def get_users():
     db = SessionLocal()
     return db.query(UserDB).all()
+
