@@ -1,17 +1,15 @@
 import streamlit as st
 import requests
 
-API = "http://127.0.0.1:8000"
 
-
-def show_books(admin_override=False):
+def show_books(API, admin_override=False):
     """Main Books Page – Works for User & Admin Mode"""
 
-    # Fetch books
+    # Fetch books using correct API
     try:
         books = requests.get(f"{API}/books").json()
     except:
-        st.error("Could not fetch books from API.")
+        st.error("Could not fetch books from server.")
         return
 
     st.title("📚 Books")
@@ -27,7 +25,10 @@ def show_books(admin_override=False):
     # Apply filters
     if search:
         q = search.lower()
-        books = [b for b in books if q in b["title"].lower() or q in b["author"].lower()]
+        books = [
+            b for b in books
+            if q in b["title"].lower() or q in b["author"].lower()
+        ]
 
     if sort_by == "Title":
         books.sort(key=lambda x: x["title"])
@@ -52,7 +53,6 @@ def show_books(admin_override=False):
 
         # ---------------- ADMIN CONTROLS ----------------
         if is_admin:
-      
 
             col1, col2 = st.columns(2)
 
@@ -67,13 +67,15 @@ def show_books(admin_override=False):
             # -------- DELETE BUTTON --------
             with col2:
                 if st.button(f"Delete {book['id']}"):
-                    delete_book(book["id"])
+                    delete_book(API, book["id"])
                     st.success("Book deleted!")
                     st.rerun()
 
 
-def delete_book(book_id):
-    """Function to call API delete"""
+# -------------------------------------------------------
+# DELETE BOOK API CALL — FIXED TO USE API PASSED IN
+# -------------------------------------------------------
+def delete_book(API, book_id):
     try:
         res = requests.delete(f"{API}/books/{book_id}")
         return res.status_code == 200
