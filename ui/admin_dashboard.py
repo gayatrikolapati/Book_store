@@ -1,15 +1,14 @@
 import streamlit as st
 import requests
 
-API = "http://127.0.0.1:8000"
+# ❗ REMOVE the old API = "127.0.0.1" line completely
 
-# Import UI components
 from ui.add_book_ui import show_add_book
 from ui.edit_book_ui import show_edit_book
 from ui.delete_book_ui import show_delete_book
 
-
-def _fetch_stats():
+# ---------------- FETCH DASHBOARD STATS ----------------
+def _fetch_stats(API):
     try:
         books = requests.get(f"{API}/books").json()
     except:
@@ -28,13 +27,14 @@ def _fetch_stats():
     return books, users, total_books, total_users, total_stock, out_of_stock
 
 
-
 def show_admin_dashboard(API):
+
     if not st.session_state.get("is_admin", False):
         st.error("Admin access only.")
         return
 
-    books, users, total_books, total_users, total_stock, out_of_stock = _fetch_stats()
+    # PASS API HERE
+    books, users, total_books, total_users, total_stock, out_of_stock = _fetch_stats(API)
 
     st.title("🛠️ Admin Dashboard")
 
@@ -57,7 +57,7 @@ def show_admin_dashboard(API):
         st.subheader("Overview")
         st.write("Admin overview and charts will appear here.")
 
-    # ------------ BOOKS TAB (THE ONE YOU WANT) ------------
+    # ------------ BOOKS TAB ------------
     with tab_books:
         st.subheader("📘 Books — Admin Controls")
 
