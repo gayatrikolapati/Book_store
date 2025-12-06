@@ -19,9 +19,10 @@ def show_add_book(API):
             "quantity": quantity
         }
 
-        r = requests.post(f"{API}/books", data=data)
-        
-        if r.status_code == 200:
+        # FIXED: json instead of data
+        response = requests.post(f"{API}/books", json=data)
+
+        if response.status_code == 200:
             st.success("Book added successfully!")
         else:
-            st.error(r.json().get("detail"))
+            st.error(response.json().get("detail", "Unknown error"))
