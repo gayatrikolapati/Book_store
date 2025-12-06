@@ -1,12 +1,17 @@
 import streamlit as st
 import requests
 
+
 def show_delete_book(API):
 
     st.subheader("🗑️ Delete Book")
 
     # Fetch books list
-    books = requests.get(f"{API}/books").json()
+    try:
+        books = requests.get(f"{API}/books").json()
+    except:
+        st.error("Failed to fetch books from backend.")
+        return
 
     if not books:
         st.info("No books available to delete.")
@@ -14,7 +19,7 @@ def show_delete_book(API):
 
     # Dropdown options
     book_options = {
-        f"{b['title']} ({b['author']})  —  ID: {b['id']}": b['id']
+        f"{b['title']} ({b['author']}) — ID: {b['id']}": b['id']
         for b in books
     }
 
@@ -24,7 +29,11 @@ def show_delete_book(API):
     st.warning(f"You are about to delete: **{selected_label}**")
 
     if st.button("Delete Book"):
-        res = requests.delete(f"{API}/books/{selected_id}")
+        try:
+            res = requests.delete(f"{API}/books/{selected_id}")
+        except:
+            st.error("Server error. Could not delete book.")
+            return
 
         if res.status_code == 200:
             st.success("Book deleted successfully!")
