@@ -39,7 +39,6 @@ if "ratings" not in st.session_state:
 if "activity" not in st.session_state:
     st.session_state.activity = []
 
-
 # ---------------- SIDEBAR NAVIGATION ----------------
 base_menus = ["Home", "Register", "Login", "Books", "Admin Dashboard"]
 
@@ -56,20 +55,18 @@ choice = st.sidebar.radio(
 
 st.session_state.menu = choice
 
-
 # ---------------- PAGE ROUTING ----------------
 if choice == "Home":
     show_home()
 
 elif choice == "Register":
-    show_register()
+    show_register(API)           # FIXED
 
 elif choice == "Login":
-    show_login()
+    show_login(API)              # FIXED
 
 elif choice == "Books":
-    show_books(API)    # FIXED: API added
+    show_books(API)              # FIXED
 
 elif choice == "Admin Dashboard":
-    show_admin_dashboard(API)   # FIXED: API passed correctly
-
+    show_admin_dashboard(API)    # FIXED
