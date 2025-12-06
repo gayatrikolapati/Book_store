@@ -6,10 +6,13 @@ import random
 import shutil
 import hashlib
 import requests
+import os
 
-# Create DB tables
 Base.metadata.create_all(bind=engine)
 
+MAILJET_API_KEY = os.getenv("MAILJET_API_KEY")
+MAILJET_SECRET_KEY = os.getenv("MAILJET_SECRET_KEY")
+MAILJET_SENDER = os.getenv("MAILJET_SENDER")
 app = FastAPI()
 
 # ===================== MAILJET CONFIG =====================
@@ -130,4 +133,5 @@ def delete_book(book_id: int):
 @app.get("/users")
 def get_users():
     db = SessionLocal()
+
     return db.query(UserDB).all()
