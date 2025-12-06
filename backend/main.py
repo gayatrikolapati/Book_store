@@ -241,4 +241,3 @@ def get_users():
     return db.query(UserDB).all()
 
 
-
